@@ -1,5 +1,10 @@
+# Standard imports
 from typing import List, Dict, Any
+from copy import deepcopy
+# Local imports
+from .loaded_model import LoadedModel
 from .model_loaders import ModelLoader, HuggingFaceLoader
+from .executors import Executor, TransformerExecutor
 
 
 class ModelFactory:
@@ -7,48 +12,73 @@ class ModelFactory:
     LOADERS: List[ModelLoader] = [
         HuggingFaceLoader()
     ]
+    EXECUTORS: List[Executor] = [
+        TransformerExecutor()
+    ]
 
     def __init__(self) -> None:
-        self.models: Dict[str, Dict] = dict()
+        self.loaded_models: Dict[str, LoadedModel] = dict()
+
+    ############################## MODIFIERS ################################
 
     def register_model(self, model_name: str, tasks: List[str],
-                       load_kwargs: Dict) -> bool:
-        if model_name in self.models:
-            return False
+                       load_kwargs: Dict[str, Any]) -> None:
+        if model_name in self.loaded_models:
+            raise Exception("Model already exists: {}".format(model_name))
         for loader in self.LOADERS:
             try:
-                res = loader.load(**load_kwargs)
-                model = res["model"]
-                tokenizer = res["tokenizer"]
-                # Model has been loaded in this case.
-                if model != None:
-                    self.models[model_name] = {
-                        "tasks": tasks,
-                        "model": model,
-                        "tokenizer": tokenizer}
-                    return True
+                loader_result = loader.load(**load_kwargs)
+                # Considered loaded
+                if loader_result != None:
+                    self.loaded_models[model_name] = LoadedModel(
+                        model_name, tasks, loader_result)
+                    return
             except Exception as e:
-                print("Exception raised when registering: {}".format(e))
-        return False
+                print(e)
+        raise Exception("No loader found for model: {}".format(model_name))
 
-    def get_tasks_model_names(self) -> Dict[str, List[str]]:
-        task_model_names = dict()
-        for model_name, details in self.models.items():
-            details: Dict
-            tasks = details.get("tasks")
-            for task in tasks:
-                if task in task_model_names:
-                    task_model_names[task].append(model_name)
+    def execute_model(self, model_name: str, task: str, execute_kwargs: Dict) \
+            -> Any:
+        if not self.is_registered_for_task(model_name, task):
+            raise Exception("Model not registered for task: {} --> {}".format(
+                model_name, task))
+        for executor in self.EXECUTORS:
+            try:
+                kwargs = deepcopy(self.loaded_models.get(
+                    model_name).execute_kwargs)
+                kwargs.update(execute_kwargs)
+                return executor.execute(**kwargs)
+            except Exception as e:
+                pass
+        raise Exception("No executor found for model with task: {} --> {}".
+                        format(model_name, task))
+
+    ################################# GETTERS #################################
+
+    def is_registered(self, model_name: str) -> bool:
+        return model_name in self.loaded_models
+
+    def is_registered_for_task(self, model_name: str, task: str) -> bool:
+        return self.is_registered(model_name) and \
+            task in self.loaded_models.get(model_name).tasks
+
+    def get_model_tasks(self, model_name: str) -> List[str]:
+        if not self.is_registered(model_name):
+            raise Exception("Model not registered: {}".format(model_name))
+        return self.loaded_models.get(model_name).tasks
+
+    def get_models_for_task(self, task: str) -> List[str]:
+        return [model_name for model_name, loaded_model
+                in self.loaded_models.items() if task in loaded_model.tasks]
+
+    def get_models_by_task(self) -> Dict[str, str]:
+        task_models = dict()
+        for model_name, loaded_model in self.loaded_models.items():
+            for task in loaded_model.tasks:
+                if task in task_models:
+                    task_models[task].append(model_name)
                 else:
-                    task_model_names[task] = [model_name]
-        return task_model_names
+                    task_models[task] = [model_name]
+        return task_models
 
-    def get_task_model(self, task: str, model_name: str) -> Dict:
-        if not model_name in self.models:
-            return
-        details = self.models.get(model_name)
-        if task in details.get("tasks"):
-            return {
-                "model": details.get("model"),
-                "tokenizer": details.get("tokenizer")
-            }
+    ################################# SETTERS #################################
