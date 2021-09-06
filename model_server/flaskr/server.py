@@ -22,15 +22,13 @@ api.register_model("distilbert-base-cased-distilled-squad",
 def execute_model():
     try:
         kwargs = request.get_json()
-        app.logger.info(kwargs)
         if not all(k in kwargs for k in ['model_name', 'task', 'execute_kwargs']):
             return {}, 404
+
         return {
             "output": api.execute_model(**kwargs)}, 200
     except Exception as e:
-        app.logger.info("ERROR {}".format(e))
-
-        return e, 500
+        return repr(e), 500
 
 
 @app.route('/get_model_tasks', methods=['GET'])
@@ -39,7 +37,7 @@ def get_model_tasks():
         model_name = request.args.get('model_name')
         return {"tasks": api.get_model_tasks(model_name)}, 200
     except Exception as e:
-        return e, 500
+        return repr(e), 500
 
 
 @app.route('/get_models_for_task', methods=['GET'])
@@ -48,16 +46,15 @@ def get_models_for_task():
         task = request.args.get('task')
         return {task: api.get_models_for_task(task)}, 200
     except Exception as e:
-        return e, 500
+        return repr(e), 500
 
 
 @app.route('/get_models_by_task', methods=['GET'])
 def get_models_by_task():
     try:
-        return {
-            'models_by_task': api.get_models_by_task()}, 200
+        return api.get_models_by_task(), 200
     except Exception as e:
-        return e, 500
+        return repr(e), 500
 
 
 # TODO: Switch to using flask run command from CLI later.

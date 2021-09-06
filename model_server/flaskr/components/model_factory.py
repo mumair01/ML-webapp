@@ -47,7 +47,6 @@ class ModelFactory:
                 kwargs = deepcopy(self.loaded_models.get(
                     model_name).execute_kwargs)
                 kwargs.update(execute_kwargs)
-                print(kwargs)
                 return executor.execute(**kwargs)
             except Exception as e:
                 print(e)

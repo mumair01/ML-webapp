@@ -1,6 +1,5 @@
 import express, { response } from "express";
 import bodyParser from "body-parser";
-import e from "express";
 
 const app = express();
 const axios = require("axios");
@@ -10,22 +9,25 @@ app.use(bodyParser.json());
 
 //--- Adding routes
 
-app.get("/api/execute", async (req, res) => {
+app.post("/api/execute", async (req, res) => {
   const { modelName, task, executeKwargs } = req.body;
+  const data = {
+    "model_name": modelName,
+    "task": task,
+    "execute_kwargs": executeKwargs,
+  };
+  console.log(data);
+
   if (!modelName || !task || !executeKwargs) {
     return res.status(404).json({ message: "Bad request" });
   }
   axios
-    .post(flaskURL + "/execute", {
-      "model_name": modelName,
-      "task": task,
-      "execute_kwargs": executeKwargs,
-    })
+    .post(flaskURL + "/execute", data)
     .then((response) => {
       console.log(response);
       res.status(200).json(response.data);
     })
-    .catch((error) => res.status(500).json({ message: e.message }));
+    .catch((error) => res.status(500).json({ message: error.message }));
 });
 
 app.get("/api/get_model_tasks", async (req, res) => {
@@ -37,7 +39,7 @@ app.get("/api/get_model_tasks", async (req, res) => {
     .then((response) => {
       res.status(200).json(response.data);
     })
-    .catch((error) => res.status(500).json({ message: e.message }));
+    .catch((error) => res.status(500).json({ message: error.message }));
 });
 
 app.get("/api/get_models_for_task", async (req, res) => {
@@ -49,7 +51,7 @@ app.get("/api/get_models_for_task", async (req, res) => {
     .then((response) => {
       res.status(200).json(response.data);
     })
-    .catch((error) => res.status(500).json({ message: e.message }));
+    .catch((error) => res.status(500).json({ message: error.message }));
 });
 
 app.get("/api/get_models_by_task", async (req, res) => {
@@ -59,7 +61,7 @@ app.get("/api/get_models_by_task", async (req, res) => {
       res.status(200).json(response.data);
     })
     .catch((error) => {
-      res.status(500);
+      res.status(500).json({ message: error.message });
     });
 });
 
