@@ -11,22 +11,25 @@ api = ODQAAPI()
 # Adding all models to the API
 api.register_model("distilbert-base-cased-distilled-squad",
                    ["question-answering"],
-                   {"model_name": "distilbert-base-cased-distilled-squad"})
+                   {"model_name": "distilbert-base-cased-distilled-squad",
+                    "task": "question-answering"})
 
 
 # ------------- Routes
 
 
-@app.route('/execute', methods=['GET'])
+@app.route('/execute', methods=['POST'])
 def execute_model():
     try:
         kwargs = request.get_json()
+        app.logger.info(kwargs)
         if not all(k in kwargs for k in ['model_name', 'task', 'execute_kwargs']):
-            return None, 404
+            return {}, 404
         return {
             "output": api.execute_model(**kwargs)}, 200
     except Exception as e:
         app.logger.info("ERROR {}".format(e))
+
         return e, 500
 
 

@@ -32,8 +32,9 @@ class TransformerExecutor:
 
     def execute(self, model: Any, tokenizer: Any, task: str,
                 input_data: Dict) -> Any:
-        if not task in self.TASKS:
-            raise Exception("Task not supported: {}".format(task))
+        # TODO: Add this check for task type
+        # if not task in self.TASKS:
+        #     raise Exception("Task not supported: {}".format(task))
         # TODO: Use the specific model for the specific task
         task_pipeline = pipeline(task)
         return task_pipeline(input_data)
