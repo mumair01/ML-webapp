@@ -21,7 +21,7 @@ const Selector = () => {
   return (
     <>
       {modelsByTask.map((item, key) => (
-        <Link to={"tasks/" + item.task + "/model/" + item.model}>
+        <Link key={key} to={"tasks/" + item.task + "/model/" + item.model}>
           {item.task + "/" + item.model}
         </Link>
       ))}

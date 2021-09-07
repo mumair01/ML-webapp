@@ -16,7 +16,6 @@ app.post("/api/execute", async (req, res) => {
     "task": task,
     "execute_kwargs": executeKwargs,
   };
-  console.log(data);
 
   if (!modelName || !task || !executeKwargs) {
     return res.status(404).json({ message: "Bad request" });
@@ -24,7 +23,6 @@ app.post("/api/execute", async (req, res) => {
   axios
     .post(flaskURL + "/execute", data)
     .then((response) => {
-      console.log(response);
       res.status(200).json(response.data);
     })
     .catch((error) => res.status(500).json({ message: error.message }));
