@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
+import Select from "react-select";
 
 const Selector = () => {
   const [modelsByTask, setModelsByTask] = useState([]);
@@ -15,16 +16,25 @@ const Selector = () => {
       }
       setModelsByTask(res);
     };
-
     fetchData();
   }, []);
+
   return (
     <>
-      {modelsByTask.map((item, key) => (
-        <Link key={key} to={"tasks/" + item.task + "/model/" + item.model}>
-          {item.task + "/" + item.model}
-        </Link>
-      ))}
+      <Select
+        options={modelsByTask.map((item) => ({
+          value: (
+            <Link to={"tasks/" + item.task + "/model/" + item.model}>
+              {item.task + "/" + item.model}
+            </Link>
+          ),
+          label: (
+            <Link to={"tasks/" + item.task + "/model/" + item.model}>
+              {item.task + "/" + item.model}
+            </Link>
+          ),
+        }))}
+      />
     </>
   );
 };

@@ -1,6 +1,5 @@
 import React from "react";
 import Selector from "../components/Selector";
-
 const HomePage = () => (
   <section
     className="colorlib-about text-center"

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { Form, Button } from "react-bootstrap";
 
 const OdqaPage = () => {
   const [result, setResult] = useState({});
@@ -27,7 +28,22 @@ const OdqaPage = () => {
     execute();
   }, []);
 
-  return <p>{JSON.stringify(result)}</p>;
+  return (
+    <Form>
+      <Form.Group className="mb-3" controlId="exampleForm.ControlTextarea1">
+        <Form.Label>Context</Form.Label>
+        <Form.Control as="textarea" rows={3} />
+      </Form.Group>
+      <Form.Group className="mb-3" controlId="exampleForm.ControlTextarea1">
+        <Form.Label>Question</Form.Label>
+        <Form.Control as="textarea" rows={3} />
+      </Form.Group>
+
+      <Button variant="primary" type="submit">
+        Submit
+      </Button>
+    </Form>
+  );
 };
 
 export default OdqaPage;

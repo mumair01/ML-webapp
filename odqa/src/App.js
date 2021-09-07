@@ -9,15 +9,20 @@ import "./App.css";
 function App() {
   return (
     <Router>
-      <div id="colorlib-page">
-        <Switch>
-          <Route path="/" component={HomePage} exact />
-          <Route
-            path="/tasks/:task/model/:model"
-            component={TasksPageSelector}
-          />
-          <Route path="*" component={NotFoundPage} />
-        </Switch>
+      <div
+        id="colorlib-page"
+        style={{ height: "100vh", background: "#FFE8E3" }}
+      >
+        <div id="colorlib-wrap">
+          <Switch>
+            <Route path="/" component={HomePage} exact />
+            <Route
+              path="/tasks/:task/model/:model"
+              component={TasksPageSelector}
+            />
+            <Route path="*" component={NotFoundPage} />
+          </Switch>
+        </div>
       </div>
     </Router>
   );
