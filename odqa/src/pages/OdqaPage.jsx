@@ -57,6 +57,7 @@ const OdqaPage = () => {
           Submit
         </Button>
       </Form>
+      <h2>Result</h2>
       <Card>
         <Card.Body>{result}</Card.Body>
       </Card>

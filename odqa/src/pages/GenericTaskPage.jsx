@@ -8,8 +8,8 @@ const GenericTaskPage = ({ task, model, page }) => (
   >
     <div className="colorlib-narrow-content col-md-12">
       <h2 className="colorlib-heading">{task + " using " + model}</h2>
+      {page}
     </div>
-    {page}
   </section>
 );
 
